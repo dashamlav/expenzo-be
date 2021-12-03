@@ -20,6 +20,9 @@ class AppUserRepo():
             username = email
             )
 
+    def doesUserExist(self, email):
+        return bool(self.getByEmail(email))
+
 appUserRepo = AppUserRepo()
 
 
