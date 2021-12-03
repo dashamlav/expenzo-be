@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from accounts.services.appUserService import appUserService
@@ -24,7 +23,7 @@ class LoginView(APIView):
         user = authenticate(username=email, password=password)
 
         if not user:
-            return Response(data={'message': 'Password does not match'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(data={'message': 'Authentication failed'}, status=status.HTTP_401_UNAUTHORIZED)
         
         token, _ = Token.objects.get_or_create(user=user)
         return Response(data={
@@ -40,7 +39,7 @@ class RegisterView(APIView):
 
     def post(self, request, *args, **kwargs):
         
-        registerSerializer = RegisterSerializer(request.data)
+        registerSerializer = RegisterSerializer(data=request.data)
 
         if not registerSerializer.is_valid():
             return Response(data={'message':'Insufficient information'}, status=status.HTTP_400_BAD_REQUEST)
@@ -49,9 +48,7 @@ class RegisterView(APIView):
         password = registerSerializer.data['password']
         name = registerSerializer.data['name']
 
-        user = appUserService.getByEmail(email)
-
-        if user:
+        if appUserService.doesUserExist(email):
             return Response(data={'message':'Account already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
         encrypted_password = make_password(password)

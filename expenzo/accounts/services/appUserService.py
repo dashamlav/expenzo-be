@@ -12,4 +12,7 @@ class AppUserService():
     def createUser(self, name, email, password):
         return appUserRepo.createUser(name, email, password)
 
+    def doesUserExist(self, email):
+        return appUserRepo.doesUserExist(email)
+        
 appUserService = AppUserService()
