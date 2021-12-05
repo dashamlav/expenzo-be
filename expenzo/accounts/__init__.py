@@ -11,3 +11,17 @@ class UserType:
         (DEFAULT, 'default')
     )
     
+
+class CurrencyType:
+
+    INR = 'inr'
+    USD = 'usd'
+    EURO = 'eur'
+    POUND = 'pnd'
+
+    Choices = (
+        (INR, 'INR'),
+        (USD, 'USD'),
+        (EURO, 'Euro'),
+        (POUND, 'Pound')
+    )
