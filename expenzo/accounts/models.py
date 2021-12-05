@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from accounts import UserType
+from accounts import UserType, CurrencyType
 
 
 class AppUser(AbstractUser):
@@ -9,7 +9,8 @@ class AppUser(AbstractUser):
     username = models.CharField(max_length=50, null=False, blank=False, default='user')
     email = models.EmailField(null=False, blank=False, unique=True)
     userType = models.CharField(max_length=3, choices=UserType.Choices, default=UserType.DEFAULT, null=False, blank=False)
-
+    defaultCurrency = models.CharField(max_length=3, choices=CurrencyType.Choices, null=False, blank=False, default=CurrencyType.INR)
+    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     

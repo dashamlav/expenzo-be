@@ -18,7 +18,7 @@ class LoginView(APIView):
         password = request.data.get('password', None)
 
         if not (email and password):
-            return Response(data={'message': "Bad request. Username/Password not found."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'message': "Username/Password not found."}, status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(username=email, password=password)
 
@@ -61,3 +61,19 @@ class RegisterView(APIView):
             }, 
             status=status.HTTP_200_OK)
         
+
+class ValidateTokenView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        
+        email = request.data.get('email', None)
+        token = request.data.get('token', None)
+
+        if not(email and token):
+            return Response(data={'message':'Insufficient information'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            token = Token.objects.get(key=token, user__email=email)
+            return Response(data={'message': 'Token Valid'}, status=status.HTTP_200_OK)
+        except Token.DoesNotExist:
+            return Response(data={'message': 'Invalid Token'}, status=status.HTTP_400_BAD_REQUEST)
