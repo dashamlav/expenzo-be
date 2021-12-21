@@ -1,7 +1,9 @@
 
 class ExpenseCategory:
     BANKING = 'bank'
+    BOOKS = 'book'
     CLOTHING = 'clo'
+    EDUCATION = 'edu'
     ENTERTAINMENT = 'ent'
     ELECTRONICS = 'elec'
     FASHION = 'fash'
@@ -17,7 +19,9 @@ class ExpenseCategory:
     
     Choices = (
         (BANKING, 'banking'),
+        (BOOKS, 'books'),
         (CLOTHING, 'clothing'),
+        (EDUCATION, 'education'),
         (ENTERTAINMENT, 'entertainment'),
         (ELECTRONICS, 'electronics'),
         (FASHION, 'fashion'),
