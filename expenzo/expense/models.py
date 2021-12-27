@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from accounts.models import AppUser
 from expense import ExpenseCategory, TransactionType
@@ -9,7 +10,7 @@ class Expense(models.Model):
     appUser = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='expenses')
     title = models.CharField(max_length=50, null=False, blank=False)
     amount = models.IntegerField(null=False, blank=False)
-    date = models.DateField(null=True, blank=True)
+    date = models.DateField(null=False, blank=False, default=datetime.datetime.today)
     currency = models.CharField(max_length=3, choices=CurrencyType.Choices, null=False, blank=False, default=CurrencyType.INR)
     category = models.CharField(max_length=4, choices=ExpenseCategory.Choices, default=ExpenseCategory.OTHER, null=False, blank=False)
     description = models.TextField(max_length=1000, null=False, blank=True)
