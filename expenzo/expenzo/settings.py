@@ -97,14 +97,14 @@ databasePort = '3306'
 DATABASES = {
     'default':{
         'ENGINE': databaseEngine,
-        'NAME': 'EXPENZO_CORE',
+        'NAME': 'expenzo_core',
         'USER': 'expenzoadmin',
         'PASSWORD': databasePassword,
         'HOST': databaseHost,
         'PORT': databasePort,
         'OPTIONS': {
-            # 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'init_command': "SET foreign_key_checks = 0;",
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            # 'init_command': "SET foreign_key_checks = 0;",
             'connect_timeout': databaseConnectionTimeOut,
         }
     }
