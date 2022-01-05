@@ -6,13 +6,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import ExpenseSerializer, ExpenseFilterSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-import json
 
 
 class GetAllExpensesView(ListAPIView):
     serializer_class = ExpenseSerializer
     permission_classes = [IsAuthenticated]
     queryset = Expense.objects.all()
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         user = self.request.user
@@ -26,7 +26,7 @@ class GetAllExpensesView(ListAPIView):
         maxAmount = filters.get('maxAmount', None)
         categories = filters.get('categories', None)
         transactionTypes = filters.get('transactionTypes', None)
-        sortBy = filters.get('sortBy')
+        sortBy = filters.get('sortBy', '-date')
 
         filterKwargs = {}
         filterKwargs['appUser'] = user

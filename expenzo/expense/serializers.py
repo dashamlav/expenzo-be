@@ -16,7 +16,7 @@ class ExpenseFilterSerializer(serializers.Serializer):
     maxDate = serializers.DateField(required=False)
     categories = ArrayField(required=False)
     transactionTypes = ArrayField(required=False)
-    sortBy = serializers.CharField(required=True)
+    sortBy = serializers.CharField(required=False)
 
     
 
