@@ -75,23 +75,3 @@ class UpdateOrDeleteExpenseView(GenericAPIView, UpdateModelMixin, DestroyModelMi
         instance.isActive = False
         instance.save()
 
-
-class TestApi(GenericAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = ExpenseFilterSerializer
-
-    def post(self, request, *args, **kwargs):
-        print(request.data)
-        print("----------------")
-        SerializerClass = self.get_serializer_class()
-        serializer = SerializerClass(data=request.data)
-        isvalid = serializer.is_valid()
-        print(isvalid)
-        print(serializer.validated_data)
-
-        # strung = '["ent","fash","gro"]'
-        # arr = json.loads(strung)
-        # print(arr)
-        # print(type(arr))
-
-        return Response(status=200)
