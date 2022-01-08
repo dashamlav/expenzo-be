@@ -95,9 +95,4 @@ class DownloadCsvView(GenericAPIView):
         response = HttpResponse(content=csv_file.getvalue(), content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=expenses.csv'
         return response
-
-
-
-        
-
         
