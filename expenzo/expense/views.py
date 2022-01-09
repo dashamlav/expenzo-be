@@ -8,6 +8,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import ExpenseSerializer, ExpenseFilterSerializer
 from rest_framework.pagination import PageNumberPagination
 from expense.utils import get_expense_data_csv
+from rest_framework.throttling import UserRateThrottle
+from .throttlers import DownloadCsvThrottle
 
 
 def _get_filter_kwargs(user, filtersQuery):
@@ -86,6 +88,7 @@ class UpdateOrDeleteExpenseView(GenericAPIView, UpdateModelMixin, DestroyModelMi
 
 class DownloadCsvView(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes = [DownloadCsvThrottle]
     
     def get(self, request, *args, **kwargs):
         user = self.request.user
