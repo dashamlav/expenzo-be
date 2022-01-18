@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from functools import reduce
 
 class ArrayField(serializers.Field):
     '''
@@ -11,3 +12,14 @@ class ArrayField(serializers.Field):
         if not isinstance(data, str):
             raise serializers.ValidationError("Input type must be string")
         return data.split(",")
+
+
+def aggregateToDict(iterable):
+    '''
+    Converts a list of dictionaries into a single dictionary
+    '''
+    return reduce(
+        lambda initial,value: initial.update(value) or initial,
+        iterable,
+        {}
+    )

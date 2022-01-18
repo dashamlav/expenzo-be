@@ -1,5 +1,13 @@
 import io
 import csv
+import datetime
+from dateutil.relativedelta import relativedelta
+from expenzo_utils.general_utils import aggregateToDict
+from expenzo_utils.dateutils import getStartToEndDateRangeForMonth
+from .models import Expense
+from functools import reduce, partial
+from django.db.models import Sum
+import itertools
 
 def get_expense_data_csv(expenses):
     csv_file = io.StringIO()
@@ -15,3 +23,47 @@ def get_expense_data_csv(expenses):
             expense.description,
         ])
     return csv_file
+
+
+def fetchDataDict(controllerFunc, appUserId, years):
+    if not years:
+        # Consider for the last 5 years
+        currentYear = datetime.datetime.now().year
+        years = range(currentYear-4, currentYear+1)
+
+    dataMap = aggregateToDict(
+        map(
+            lambda yearToMonthDataIt:
+                reduce(
+                    lambda initial, value: initial.setdefault(value[0], {}).update(value[1]) or initial,
+                    yearToMonthDataIt,
+                    {}
+                ),
+            map(
+                partial(itertools.starmap, controllerFunc),
+                map(
+                    partial(zip, itertools.repeat(appUserId), range(1,13)),
+                    map(itertools.repeat, years)
+                )
+            )
+        )
+    )
+    return dataMap
+
+def getMonthlyExpenseData(appUserId, month, year):
+    dateRange = getStartToEndDateRangeForMonth(year, month)
+    monthName = datetime.datetime.strptime(str(month), "%m").strftime("%b")
+    monthTotal = Expense.objects.filter(appUser_id=appUserId, date__range=dateRange).aggregate(Sum('amount'))['amount__sum']
+    monthTotal = monthTotal if monthTotal else 0
+    return (year,{monthName:monthTotal})
+
+def getCategoryWiseExpenseData(appUserId, month, year):
+    dateRange = getStartToEndDateRangeForMonth(year, month)
+    categoryData = Expense.objects.filter(appUser_id=appUserId, date__range=dateRange).values('category').annotate(Sum('amount'))
+    monthName = datetime.datetime.strptime(str(month), "%m").strftime("%b")
+
+    categoryNameToAmountMap = {}
+    for categoryDict in categoryData:
+        categoryNameToAmountMap[categoryDict['category']] = categoryDict['amount__sum']
+
+    return (year,{monthName:categoryNameToAmountMap})

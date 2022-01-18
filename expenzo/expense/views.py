@@ -1,4 +1,4 @@
-
+import json
 from django.http.response import HttpResponse
 from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, get_object_or_404
 from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
@@ -8,7 +8,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import ExpenseSerializer, ExpenseFilterSerializer
 from rest_framework.pagination import PageNumberPagination
 from expense.utils import get_expense_data_csv
-from rest_framework.throttling import UserRateThrottle
+from expense.utils import fetchDataDict
+from expense.utils import getMonthlyExpenseData, getCategoryWiseExpenseData
 from .throttlers import DownloadCsvThrottle
 
 
@@ -98,4 +99,32 @@ class DownloadCsvView(GenericAPIView):
         response = HttpResponse(content=csv_file.getvalue(), content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=expenses.csv'
         return response
-        
+
+
+class GetMonthlyExpenseDataView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+
+        appUserId=self.request.user.id
+        yearToMonthlyExpenseMap = fetchDataDict(
+            controllerFunc=getMonthlyExpenseData,
+            appUserId=appUserId,
+            years=None)
+        return HttpResponse(status=200, content=json.dumps(yearToMonthlyExpenseMap), content_type='application/json')
+
+
+class GetCategoryDataView(GenericAPIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+
+        appUser_id = self.request.user.id
+        yearToMonthlyCategoryExpenseMap = fetchDataDict(
+            controllerFunc=getCategoryWiseExpenseData,
+            appUserId=appUser_id,
+            years=None)
+
+        return HttpResponse(status=200, content=json.dumps(yearToMonthlyCategoryExpenseMap), content_type='application/json')
+    
