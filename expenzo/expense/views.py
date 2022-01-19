@@ -1,4 +1,6 @@
 import json
+import datetime
+from functools import partial
 from django.http.response import HttpResponse
 from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView, get_object_or_404
 from rest_framework.mixins import UpdateModelMixin, DestroyModelMixin
@@ -9,7 +11,7 @@ from .serializers import ExpenseSerializer, ExpenseFilterSerializer
 from rest_framework.pagination import PageNumberPagination
 from expense.utils import get_expense_data_csv
 from expense.utils import fetchDataDict
-from expense.utils import getMonthlyExpenseData, getCategoryWiseExpenseData
+from expense.utils import getMonthlyExpenseData, getFieldWiseMonthlyExpenseData, getFieldWiseYearlyExpenseData
 from .throttlers import DownloadCsvThrottle
 
 
@@ -107,24 +109,41 @@ class GetMonthlyExpenseDataView(GenericAPIView):
     def get(self, request, *args, **kwargs):
 
         appUserId=self.request.user.id
+        currentYear = datetime.datetime.now().year
+        years = range(currentYear-4, currentYear+1)
+
         yearToMonthlyExpenseMap = fetchDataDict(
             controllerFunc=getMonthlyExpenseData,
             appUserId=appUserId,
-            years=None)
+            years=years
+        )
+
         return HttpResponse(status=200, content=json.dumps(yearToMonthlyExpenseMap), content_type='application/json')
 
 
-class GetCategoryDataView(GenericAPIView):
+class GetFieldDataView(GenericAPIView):
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
 
         appUser_id = self.request.user.id
-        yearToMonthlyCategoryExpenseMap = fetchDataDict(
-            controllerFunc=getCategoryWiseExpenseData,
-            appUserId=appUser_id,
-            years=None)
+        fieldType = self.request.query_params.get('fieldType', None)
+        if not fieldType:
+            return HttpResponse(status=400, content="Invalid field type")
 
-        return HttpResponse(status=200, content=json.dumps(yearToMonthlyCategoryExpenseMap), content_type='application/json')
+        currentYear = datetime.datetime.now().year
+        years = range(currentYear-4, currentYear+1)
+
+        yearToMonthlyFieldExpenseMap = fetchDataDict(
+            controllerFunc=partial(getFieldWiseMonthlyExpenseData, fieldType=fieldType),
+            appUserId=appUser_id,
+            years=years
+        )
+
+        for year in years:
+            allmonthsData = getFieldWiseYearlyExpenseData(appUserId=appUser_id, year=year, fieldType=fieldType)
+            yearToMonthlyFieldExpenseMap[year].update({'All':allmonthsData})
+
+        return HttpResponse(status=200, content=json.dumps(yearToMonthlyFieldExpenseMap), content_type='application/json')
     

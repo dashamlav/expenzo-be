@@ -24,12 +24,7 @@ def get_expense_data_csv(expenses):
         ])
     return csv_file
 
-
 def fetchDataDict(controllerFunc, appUserId, years):
-    if not years:
-        # Consider for the last 5 years
-        currentYear = datetime.datetime.now().year
-        years = range(currentYear-4, currentYear+1)
 
     dataMap = aggregateToDict(
         map(
@@ -57,13 +52,22 @@ def getMonthlyExpenseData(appUserId, month, year):
     monthTotal = monthTotal if monthTotal else 0
     return (year,{monthName:monthTotal})
 
-def getCategoryWiseExpenseData(appUserId, month, year):
+def getFieldWiseMonthlyExpenseData(appUserId, month, year, fieldType=None):
     dateRange = getStartToEndDateRangeForMonth(year, month)
-    categoryData = Expense.objects.filter(appUser_id=appUserId, date__range=dateRange).values('category').annotate(Sum('amount'))
+    fieldData = Expense.objects.filter(appUser_id=appUserId, date__range=dateRange).values(fieldType).annotate(Sum('amount'))
     monthName = datetime.datetime.strptime(str(month), "%m").strftime("%b")
 
-    categoryNameToAmountMap = {}
-    for categoryDict in categoryData:
-        categoryNameToAmountMap[categoryDict['category']] = categoryDict['amount__sum']
+    fieldToAmountMap = {}
+    for fieldDict in fieldData:
+        fieldToAmountMap[fieldDict[fieldType]] = fieldDict['amount__sum']
 
-    return (year,{monthName:categoryNameToAmountMap})
+    return (year,{monthName:fieldToAmountMap})
+
+def getFieldWiseYearlyExpenseData(appUserId, year, fieldType=None):
+    daterange = (datetime.date(year,1,1), datetime.date(year,12,31))
+    fieldData = Expense.objects.filter(appUser_id=appUserId, date__range=daterange).values(fieldType).annotate(Sum('amount'))
+    fieldToAmountMap = {}
+    for fieldDict in fieldData:
+        fieldToAmountMap[fieldDict[fieldType]] = fieldDict['amount__sum']
+    return fieldToAmountMap
+
