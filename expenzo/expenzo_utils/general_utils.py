@@ -1,3 +1,4 @@
+import random
 from rest_framework import serializers
 from functools import reduce
 
@@ -23,3 +24,6 @@ def aggregateToDict(iterable):
         iterable,
         {}
     )
+
+def generateOTP():
+    return int(random.uniform(0.1,1)*1000000)

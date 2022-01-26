@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from accounts.services.appUserService import appUserService
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from .serializers import RegisterSerializer
+from expenzo_utils.general_utils import generateOTP
 
 class LoginView(APIView):
     
@@ -32,9 +34,29 @@ class LoginView(APIView):
             }, 
             status=status.HTTP_200_OK)
 
-       
-class RegisterView(APIView):
 
+class RegisterPreflightView(APIView):
+    '''
+    Hit before the RegisterView. Sends user an email with a OTP and returns the OTP to front-end
+    '''
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+
+        name = request.data['name']
+        email = request.data['email']
+
+        if appUserService.doesUserExist(email):
+            return Response(data={'message':'Account already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        otp = generateOTP()
+        cache.set(email,otp,90)
+
+        #Send email here
+        
+        return Response(status=status.HTTP_200_OK, data={'message':'Email sent successfully'})
+
+class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
@@ -47,9 +69,12 @@ class RegisterView(APIView):
         email = registerSerializer.data['email']
         password = registerSerializer.data['password']
         name = registerSerializer.data['name']
+        otp = registerSerializer.data['otp']
 
-        if appUserService.doesUserExist(email):
-            return Response(data={'message':'Account already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        cached_otp = cache.get(email)
+
+        if not cached_otp or cached_otp != otp:
+            return Response(data={'message':'Incorrect OTP'}, status=status.HTTP_401_UNAUTHORIZED)
 
         encrypted_password = make_password(password)
         createdUser = appUserService.createUser(name, email, encrypted_password)
@@ -60,7 +85,7 @@ class RegisterView(APIView):
             'token': token.key
             }, 
             status=status.HTTP_200_OK)
-        
+
 
 class ValidateTokenView(APIView):
     permission_classes = [AllowAny]
