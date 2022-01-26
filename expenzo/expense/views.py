@@ -122,14 +122,14 @@ class GetMonthlyExpenseDataView(GenericAPIView):
 
 
 class GetFieldDataView(GenericAPIView):
-
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
 
         appUser_id = self.request.user.id
         fieldType = self.request.query_params.get('fieldType', None)
-        if not fieldType:
+
+        if not fieldType or fieldType not in ['category','transactionType']:
             return HttpResponse(status=400, content="Invalid field type")
 
         currentYear = datetime.datetime.now().year
@@ -141,6 +141,7 @@ class GetFieldDataView(GenericAPIView):
             years=years
         )
 
+        #Add yearly data as well
         for year in years:
             allmonthsData = getFieldWiseYearlyExpenseData(appUserId=appUser_id, year=year, fieldType=fieldType)
             yearToMonthlyFieldExpenseMap[year].update({'All':allmonthsData})

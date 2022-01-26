@@ -1,13 +1,13 @@
-import io
 import csv
 import datetime
+import io
+import itertools
 from dateutil.relativedelta import relativedelta
 from expenzo_utils.general_utils import aggregateToDict
 from expenzo_utils.dateutils import getStartToEndDateRangeForMonth
 from .models import Expense
 from functools import reduce, partial
 from django.db.models import Sum
-import itertools
 
 def get_expense_data_csv(expenses):
     csv_file = io.StringIO()
@@ -19,7 +19,7 @@ def get_expense_data_csv(expenses):
             expense.amount, 
             expense.date, 
             expense.get_category_display(), 
-            expense.get_transactionType_display(), 
+            expense.get_transactionType_display(),
             expense.description,
         ])
     return csv_file
