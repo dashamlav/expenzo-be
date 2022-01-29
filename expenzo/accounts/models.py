@@ -1,6 +1,9 @@
+
+import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from accounts import UserType, CurrencyType
+from rest_framework.authtoken.models import Token
 
 
 class AppUser(AbstractUser):

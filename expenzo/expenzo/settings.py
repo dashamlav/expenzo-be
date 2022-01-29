@@ -25,7 +25,7 @@ SECRET_KEY = 'l%vh-)+h##5xy+4by-nflas2ko^^11r-_&!x-&pqnyn2(=@=^h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 EXPENZO_APPS = [
     'accounts',
     'expense',
+    'feedback',
 ]
 
 DJANGO_APPS = [
@@ -142,7 +143,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
     ]
 }
 
@@ -173,3 +174,5 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
+
+SMTP_PASS = os.environ.get('EXPENZO_SMTP_PASS')
