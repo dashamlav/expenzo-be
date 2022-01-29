@@ -9,6 +9,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from .serializers import RegisterSerializer
 from expenzo_utils.general_utils import generateOTP
+from expenzo_utils.email_utils import send_otp_email
 
 class LoginView(APIView):
     
@@ -52,7 +53,7 @@ class RegisterPreflightView(APIView):
         otp = generateOTP()
         cache.set(email,otp,90)
 
-        #Send email here
+        send_otp_email(email, name, otp)
         
         return Response(status=status.HTTP_200_OK, data={'message':'Email sent successfully'})
 
