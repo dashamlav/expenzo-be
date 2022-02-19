@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import expenzo_secrets
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,13 +21,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'l%vh-)+h##5xy+4by-nflas2ko^^11r-_&!x-&pqnyn2(=@=^h'
+# SECRET_KEY = 'l%vh-)+h##5xy+4by-nflas2ko^^11r-_&!x-&pqnyn2(=@=^h'
+SECRET_KEY = expenzo_secrets.DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if expenzo_secrets.EXPENZO_ENV == 'PROD' else True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
+if expenzo_secrets.EXPENZO_ENV == 'PROD':
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
 
 # Application definition
 
@@ -49,7 +55,6 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-
 ]
 
 INSTALLED_APPS = EXPENZO_APPS + DJANGO_APPS + THIRD_PARTY_APPS
@@ -89,8 +94,10 @@ WSGI_APPLICATION = 'expenzo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-databaseHost = '127.0.0.1'
-databasePassword = '8Z^!mx9A3%YZ+MoK'
+# databaseHost = '127.0.0.1'
+databaseHost = 'db' if expenzo_secrets.EXPENZO_ENV == 'PROD' else '127.0.0.1'
+# databasePassword = '8Z^!mx9A3%YZ+MoK'
+databasePassword = expenzo_secrets.MYSQL_DB_PASSWORD
 databaseEngine = 'django.db.backends.mysql'
 databaseConnectionTimeOut = 3000
 databasePort = '3306'
@@ -104,9 +111,7 @@ DATABASES = {
         'HOST': databaseHost,
         'PORT': databasePort,
         'OPTIONS': {
-            # 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            # # 'init_command': "SET foreign_key_checks = 0;",
-            # 'connect_timeout': databaseConnectionTimeOut,
+            'connect_timeout': databaseConnectionTimeOut,
             'read_default_file': '/usr/local/etc/my.cnf'
         }
     }
@@ -142,7 +147,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'expenzo_utils.general_utils.ExpiringTokenAuthentication'
+        # 'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
     ]
 }
@@ -171,8 +177,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 
-SMTP_PASS = os.environ.get('EXPENZO_SMTP_PASS')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+SMTP_PASS = expenzo_secrets.EXPENZO_SMTP_PASS
+
+TIME_ZONE =  'Asia/Kolkata'

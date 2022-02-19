@@ -1,6 +1,28 @@
 import random
 from rest_framework import serializers
 from functools import reduce
+from rest_framework.authentication import TokenAuthentication
+from accounts.models import AuthToken
+from rest_framework import exceptions
+
+class ExpiringTokenAuthentication(TokenAuthentication):
+    model = AuthToken
+
+    def authenticate_credentials(self, key):
+        model = self.get_model()
+        try:
+            token = model.objects.select_related('user').get(key=key)
+        except model.DoesNotExist:
+            raise exceptions.AuthenticationFailed('Invalid token.')
+
+        if not token.user.is_active:
+            raise exceptions.AuthenticationFailed('User inactive or deleted.')
+
+        if token.isExpired:
+            raise exceptions.AuthenticationFailed('Token expired')
+
+        return (token.user, token)
+
 
 class ArrayField(serializers.Field):
     '''
