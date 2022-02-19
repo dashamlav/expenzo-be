@@ -10,7 +10,7 @@ class AppUserRepo():
         return self._base_query().filter(id=id, is_active=True)
 
     def getByEmail(self, email):
-        return self._base_query().filter(email=email, is_active=True)
+        return self._base_query().filter(email=email, is_active=True).last()
 
     def createUser(self, name, email, password):
         return AppUser.objects.create(

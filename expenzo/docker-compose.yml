@@ -1,0 +1,36 @@
+version: "3"
+   
+services:
+  db:
+    image: mysql
+    ports:
+      - '4444:3306'
+    environment:
+      MYSQL_DATABASE: 'expenzo_core'
+      MYSQL_USER: 'expenzoadmin'
+      MYSQL_PASSWORD: '8Z^!mx9A3%YZ+MoK'
+    volumes:
+      - ./data/db:/var/lib/mysql
+  web:
+    build: .
+    # command: python manage.py runserver 0.0.0.0:8000
+    command: ./start_expenzo_server.sh
+    volumes:
+      - .:/expenzo-be
+    ports:
+      - "8000:8000"
+    environment:
+      MYSQL_DATABASE: 'expenzo_core'
+      MYSQL_USER: 'expenzoadmin'
+      MYSQL_PASSWORD: '8Z^!mx9A3%YZ+MoK'
+    depends_on:
+      - db
+  migration:
+    image: expenzo_web
+    command: python manage.py migrate --noinput
+    volumes:
+      - .:/expenzo-be
+    depends_on:
+      - db
+
+      

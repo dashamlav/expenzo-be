@@ -1,5 +1,6 @@
 
-import datetime
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from accounts import UserType, CurrencyType
@@ -16,5 +17,16 @@ class AppUser(AbstractUser):
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+
+
+def getExpiryDate():
+    return timezone.now() + relativedelta(days=15)
+
+class AuthToken(Token):
+    expiryTime = models.DateTimeField(default=getExpiryDate, null=False, blank=False)
+
+    @property
+    def isExpired(self):
+        return timezone.now() > self.expiryTime
     
 

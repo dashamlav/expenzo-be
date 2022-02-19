@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AppUser
+from .models import AppUser, AuthToken
 
-admin.site.register(AppUser)
+admin.site.register([AppUser, AuthToken])
 
