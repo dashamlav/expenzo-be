@@ -1,4 +1,6 @@
+import redis
 import random
+import expenzo_secrets
 from rest_framework import serializers
 from functools import reduce
 from rest_framework.authentication import TokenAuthentication
@@ -49,3 +51,14 @@ def aggregateToDict(iterable):
 
 def generateOTP():
     return int(random.uniform(0.1,1)*1000000)
+
+def get_redis_client():
+    host = 'localhost' if expenzo_secrets.EXPENZO_ENV == 'LOCAL' else 'cache'
+    
+    return redis.StrictRedis(
+        host=host,
+        port=6379,
+        password='xx7irOMa6KpuoSVGzMmVYhzb5iR7quXd', 
+        charset='utf-8', 
+        errors='strict',
+        )
