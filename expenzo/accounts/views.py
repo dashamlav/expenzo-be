@@ -1,9 +1,10 @@
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from accounts.services.appUserService import appUserService
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
-from django.core.cache import cache
+# from django.core.cache import cache
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
@@ -12,6 +13,7 @@ from expenzo_utils.general_utils import generateOTP
 from expenzo_utils.email_utils import send_otp_email
 from accounts.services.tokenService import tokenService
 from .models import AuthToken
+from expenzo_utils.general_utils import get_redis_client
 
 class LoginView(APIView):
     
@@ -57,11 +59,16 @@ class RegisterPreflightView(APIView):
             return Response(data={'message':'Account already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
         otp = generateOTP()
-        cache.set(email,otp,90)
+        try:
 
-        send_otp_email(email, name, otp)
-        
-        return Response(status=status.HTTP_200_OK, data={'message':'Email sent successfully'})
+            cache = get_redis_client()
+            cache.set(email,otp,ex=90)
+            send_otp_email(email, name, otp)
+            
+            return Response(status=status.HTTP_200_OK, data={'message':'Email sent successfully'})
+        except Exception as e:
+            print(e)
+            return Response(status=500)
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -78,7 +85,8 @@ class RegisterView(APIView):
         name = registerSerializer.data['name']
         otp = registerSerializer.data['otp']
 
-        cached_otp = cache.get(email)
+        cache = get_redis_client()
+        cached_otp = int(cache.get(email))
 
         if not cached_otp or cached_otp != otp:
             return Response(data={'message':'Incorrect OTP'}, status=status.HTTP_401_UNAUTHORIZED)

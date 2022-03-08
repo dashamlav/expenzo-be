@@ -4,11 +4,14 @@ services:
   db:
     image: mysql
     ports:
-      - '4444:3306'
+      - '3307:3306'
     environment:
       MYSQL_DATABASE: 'expenzo_core'
       MYSQL_USER: 'expenzoadmin'
+      # MYSQL_USER: 'expenzoadmin'
       MYSQL_PASSWORD: '8Z^!mx9A3%YZ+MoK'
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
     volumes:
       - ./data/db:/var/lib/mysql
   web:
@@ -32,5 +35,11 @@ services:
       - .:/expenzo-be
     depends_on:
       - db
-
+      - web
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass xx7irOMa6KpuoSVGzMmVYhzb5iR7quXd
       

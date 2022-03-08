@@ -27,12 +27,12 @@ SECRET_KEY = expenzo_secrets.DJANGO_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if expenzo_secrets.EXPENZO_ENV == 'PROD' else True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'db']
 
-if expenzo_secrets.EXPENZO_ENV == 'PROD':
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
+# if expenzo_secrets.EXPENZO_ENV == 'PROD':
+#     CSRF_COOKIE_SECURE = True
+#     SESSION_COOKIE_SECURE = True
+#     SECURE_SSL_REDIRECT = True
 
 # Application definition
 
@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'expenzo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# databaseHost = '127.0.0.1'
+# databaseHost = 'db'
 databaseHost = 'db' if expenzo_secrets.EXPENZO_ENV == 'PROD' else '127.0.0.1'
 # databasePassword = '8Z^!mx9A3%YZ+MoK'
 databasePassword = expenzo_secrets.MYSQL_DB_PASSWORD
@@ -148,8 +148,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'expenzo_utils.general_utils.ExpiringTokenAuthentication'
-        # 'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
     ]
 }
 
