@@ -5,7 +5,6 @@ django-cors-headers==3.10.0
 django-filter==21.1
 django-redis==5.2.0
 djangorestframework==3.12.4
-Faker==11.3.0
 importlib-metadata==4.8.2
 Markdown==3.3.6
 mysqlclient==2.1.0
