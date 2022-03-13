@@ -21,14 +21,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'l%vh-)+h##5xy+4by-nflas2ko^^11r-_&!x-&pqnyn2(=@=^h'
 SECRET_KEY = expenzo_secrets.DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if expenzo_secrets.EXPENZO_ENV == 'PROD' else True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'db']
 
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'db']
+ALLOWED_HOSTS = ['*']
 # if expenzo_secrets.EXPENZO_ENV == 'PROD':
 #     CSRF_COOKIE_SECURE = True
 #     SESSION_COOKIE_SECURE = True
@@ -94,9 +94,7 @@ WSGI_APPLICATION = 'expenzo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# databaseHost = 'db'
 databaseHost = 'db' if expenzo_secrets.EXPENZO_ENV == 'PROD' else '127.0.0.1'
-# databasePassword = '8Z^!mx9A3%YZ+MoK'
 databasePassword = expenzo_secrets.MYSQL_DB_PASSWORD
 databaseEngine = 'django.db.backends.mysql'
 databaseConnectionTimeOut = 3000
