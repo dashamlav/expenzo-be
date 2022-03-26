@@ -26,9 +26,7 @@ SECRET_KEY = expenzo_secrets.DJANGO_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if expenzo_secrets.EXPENZO_ENV == 'PROD' else True
 
-
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'db']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', ' localhost', 'expenzo.org', 'www.expenzo.org']
 # if expenzo_secrets.EXPENZO_ENV == 'PROD':
 #     CSRF_COOKIE_SECURE = True
 #     SESSION_COOKIE_SECURE = True
@@ -152,6 +150,8 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
     "http://127.0.0.1:3000",
+    "https://www.expenzo.org",
+    "https://expenzo.org",
 ]
 
 # Internationalization
