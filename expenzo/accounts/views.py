@@ -32,6 +32,7 @@ class LoginView(APIView):
         if not user:
             return Response(data={'message': 'Authentication failed'}, status=status.HTTP_401_UNAUTHORIZED)
         
+        first_name = user.first_name.split(' ')[0]
         token = tokenService.replaceExistingToken(user=user)
         if not token:
             token, _ = AuthToken.objects.get_or_create(user=user)
@@ -40,6 +41,7 @@ class LoginView(APIView):
             'message': 'User authenticated succesfully',
             'token': token.key,
             'tokenExpiryTime': token.expiryTime,
+            'user_name': first_name
             }, 
             status=status.HTTP_200_OK)
 
